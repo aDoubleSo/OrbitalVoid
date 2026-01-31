@@ -229,110 +229,182 @@ function drawRocket(rocket, isPlayer) {
   ctx.rotate(rocket.angle);
 
   const colors = isPlayer ? {
-    body: '#00d4ff',
-    accent: '#0088aa',
-    dark: '#004466',
-    flame: '#00ffff'
+    body: '#e8e8e8',
+    wing: '#00d4ff',
+    dark: '#888888',
+    cockpit: '#1a1a2e',
+    flame: '#00ffff',
+    accent: '#0088aa'
   } : {
-    body: '#ff6644',
-    accent: '#aa4422',
-    dark: '#662211',
-    flame: '#ffaa00'
+    body: '#e8e8e8',
+    wing: '#ff6644',
+    dark: '#888888',
+    cockpit: '#1a1a2e',
+    flame: '#ffaa00',
+    accent: '#aa4422'
   };
 
-  // Main thruster flame (when thrusting)
+  // Main thruster flames (when thrusting)
   if (rocket.thrusting) {
-    drawMainThruster(colors.flame);
+    drawShuttleThruster(-18, -4, colors.flame);
+    drawShuttleThruster(-18, 0, colors.flame);
+    drawShuttleThruster(-18, 4, colors.flame);
   }
 
-  // Side thruster flames (when turning)
+  // Side thruster flames (RCS - when turning)
   if (rocket.turningLeft) {
-    drawSideThruster(8, -12, Math.PI / 2, colors.flame);  // Right side, pushing left
-    drawSideThruster(-10, 10, -Math.PI / 2, colors.flame); // Left rear, pushing right
+    drawSideThruster(12, -6, Math.PI / 2, colors.flame);
+    drawSideThruster(-14, 8, -Math.PI / 2, colors.flame);
   }
   if (rocket.turningRight) {
-    drawSideThruster(8, 12, -Math.PI / 2, colors.flame);  // Left side, pushing right
-    drawSideThruster(-10, -10, Math.PI / 2, colors.flame); // Right rear, pushing left
+    drawSideThruster(12, 6, -Math.PI / 2, colors.flame);
+    drawSideThruster(-14, -8, Math.PI / 2, colors.flame);
   }
 
-  // Rocket body shadow
+  // Delta wings (underneath)
+  ctx.fillStyle = colors.wing;
+  ctx.beginPath();
+  ctx.moveTo(0, -6);
+  ctx.lineTo(-20, -22);
+  ctx.lineTo(-16, -6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(0, 6);
+  ctx.lineTo(-20, 22);
+  ctx.lineTo(-16, 6);
+  ctx.closePath();
+  ctx.fill();
+
+  // Wing stripes
+  ctx.fillStyle = colors.accent;
+  ctx.beginPath();
+  ctx.moveTo(-2, -7);
+  ctx.lineTo(-16, -18);
+  ctx.lineTo(-14, -7);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-2, 7);
+  ctx.lineTo(-16, 18);
+  ctx.lineTo(-14, 7);
+  ctx.closePath();
+  ctx.fill();
+
+  // Main fuselage shadow
   ctx.fillStyle = colors.dark;
   ctx.beginPath();
   ctx.moveTo(22, 0);
-  ctx.lineTo(-12, -10);
-  ctx.lineTo(-12, 10);
+  ctx.quadraticCurveTo(20, -5, 14, -6);
+  ctx.lineTo(-16, -6);
+  ctx.lineTo(-18, 0);
+  ctx.lineTo(-16, 6);
+  ctx.lineTo(14, 6);
+  ctx.quadraticCurveTo(20, 5, 22, 0);
   ctx.closePath();
   ctx.fill();
 
-  // Main body
+  // Main fuselage (white body like real shuttle)
   ctx.fillStyle = colors.body;
   ctx.beginPath();
-  ctx.moveTo(20, 0);       // Nose
-  ctx.lineTo(8, -7);       // Upper front
-  ctx.lineTo(-8, -8);      // Upper back
-  ctx.lineTo(-12, -6);     // Upper tail
-  ctx.lineTo(-12, 6);      // Lower tail
-  ctx.lineTo(-8, 8);       // Lower back
-  ctx.lineTo(8, 7);        // Lower front
+  ctx.moveTo(20, 0);
+  ctx.quadraticCurveTo(18, -4, 12, -5);
+  ctx.lineTo(-14, -5);
+  ctx.lineTo(-16, 0);
+  ctx.lineTo(-14, 5);
+  ctx.lineTo(12, 5);
+  ctx.quadraticCurveTo(18, 4, 20, 0);
   ctx.closePath();
   ctx.fill();
 
-  // Cockpit
-  ctx.fillStyle = '#aaeeff';
+  // Cargo bay doors (lines on top)
+  ctx.strokeStyle = colors.dark;
+  ctx.lineWidth = 0.5;
   ctx.beginPath();
-  ctx.ellipse(8, 0, 5, 3, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  ctx.moveTo(8, -4);
+  ctx.lineTo(-10, -4);
+  ctx.stroke();
   ctx.beginPath();
-  ctx.ellipse(9, -1, 2, 1.5, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.moveTo(8, 4);
+  ctx.lineTo(-10, 4);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-2, -4);
+  ctx.lineTo(-2, 4);
+  ctx.stroke();
 
-  // Body stripe
-  ctx.fillStyle = colors.accent;
-  ctx.fillRect(-6, -3, 10, 6);
-
-  // Top fin
-  ctx.fillStyle = colors.accent;
+  // Cockpit windows
+  ctx.fillStyle = colors.cockpit;
   ctx.beginPath();
-  ctx.moveTo(-6, -8);
-  ctx.lineTo(-14, -16);
-  ctx.lineTo(-14, -8);
+  ctx.moveTo(18, 0);
+  ctx.quadraticCurveTo(16, -3, 10, -4);
+  ctx.lineTo(10, 4);
+  ctx.quadraticCurveTo(16, 3, 18, 0);
   ctx.closePath();
   ctx.fill();
 
-  // Bottom fin
+  // Window shine
+  ctx.fillStyle = 'rgba(100, 200, 255, 0.3)';
   ctx.beginPath();
-  ctx.moveTo(-6, 8);
-  ctx.lineTo(-14, 16);
-  ctx.lineTo(-14, 8);
+  ctx.moveTo(16, -1);
+  ctx.quadraticCurveTo(14, -2, 12, -2.5);
+  ctx.lineTo(12, -1);
+  ctx.quadraticCurveTo(14, -0.5, 16, -1);
   ctx.closePath();
   ctx.fill();
 
-  // Engine nozzles
-  ctx.fillStyle = '#333';
-  ctx.fillRect(-14, -5, 4, 3);
-  ctx.fillRect(-14, 2, 4, 3);
+  // Vertical tail fin (top-down shows as rectangle)
+  ctx.fillStyle = colors.wing;
+  ctx.beginPath();
+  ctx.moveTo(-10, 0);
+  ctx.lineTo(-18, 0);
+  ctx.lineTo(-18, -2);
+  ctx.lineTo(-12, -2);
+  ctx.lineTo(-10, 0);
+  ctx.closePath();
+  ctx.fill();
 
-  // Side thruster housings
+  // OMS pods (orbital maneuvering system - bumps at rear)
+  ctx.fillStyle = colors.body;
+  ctx.beginPath();
+  ctx.ellipse(-14, -6, 3, 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(-14, 6, 3, 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Engine bells
+  ctx.fillStyle = '#222';
+  ctx.beginPath();
+  ctx.arc(-17, -4, 2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-17, 0, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-17, 4, 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // RCS thruster pods
   ctx.fillStyle = '#444';
-  ctx.fillRect(5, -10, 6, 3);
-  ctx.fillRect(5, 7, 6, 3);
-  ctx.fillRect(-12, -13, 4, 3);
-  ctx.fillRect(-12, 10, 4, 3);
+  ctx.fillRect(10, -8, 4, 3);
+  ctx.fillRect(10, 5, 4, 3);
+  ctx.fillRect(-16, -10, 3, 3);
+  ctx.fillRect(-16, 7, 3, 3);
 
   // Nose highlight
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(18, -2);
-  ctx.lineTo(10, -5);
+  ctx.moveTo(18, -1);
+  ctx.quadraticCurveTo(15, -3, 10, -4);
   ctx.stroke();
 
   ctx.restore();
 
-  // Health bar above rocket
+  // Health bar above shuttle
   if (rocket.health < 100) {
-    drawHealthBar(rocket.x, rocket.y - 30, rocket.health);
+    drawHealthBar(rocket.x, rocket.y - 35, rocket.health);
   }
 
   // Name tag
@@ -340,35 +412,33 @@ function drawRocket(rocket, isPlayer) {
   ctx.fillStyle = isPlayer ? '#00d4ff' : '#ff6644';
   ctx.font = 'bold 12px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText(rocket.name, rocket.x, rocket.y + 35);
+  ctx.fillText(rocket.name, rocket.x, rocket.y + 40);
   ctx.restore();
 }
 
-function drawMainThruster(color) {
+function drawShuttleThruster(x, y, color) {
   const flicker = 0.8 + Math.random() * 0.4;
-  const length = 15 + Math.random() * 10;
+  const length = 12 + Math.random() * 8;
 
   // Outer flame
-  const gradient = ctx.createLinearGradient(-12, 0, -12 - length, 0);
+  const gradient = ctx.createLinearGradient(x, y, x - length, y);
   gradient.addColorStop(0, color);
-  gradient.addColorStop(0.5, 'rgba(255, 200, 50, 0.8)');
+  gradient.addColorStop(0.4, 'rgba(255, 200, 50, 0.9)');
+  gradient.addColorStop(0.7, 'rgba(255, 100, 50, 0.6)');
   gradient.addColorStop(1, 'transparent');
 
   ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.moveTo(-12, -4 * flicker);
-  ctx.lineTo(-12 - length * flicker, 0);
-  ctx.lineTo(-12, 4 * flicker);
+  ctx.moveTo(x, y - 2 * flicker);
+  ctx.lineTo(x - length * flicker, y);
+  ctx.lineTo(x, y + 2 * flicker);
   ctx.closePath();
   ctx.fill();
 
-  // Inner flame
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  // Inner bright core
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
   ctx.beginPath();
-  ctx.moveTo(-12, -2);
-  ctx.lineTo(-18, 0);
-  ctx.lineTo(-12, 2);
-  ctx.closePath();
+  ctx.arc(x - 2, y, 1.5, 0, Math.PI * 2);
   ctx.fill();
 }
 
