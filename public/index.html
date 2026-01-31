@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orbital Void</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="login-screen">
+    <h1>ORBITAL VOID</h1>
+    <div class="login-form">
+      <input type="text" id="player-name" placeholder="Your Name" maxlength="12">
+      <input type="text" id="room-id" placeholder="Room Code" maxlength="8">
+      <button id="join-btn">JOIN GAME</button>
+    </div>
+    <p class="hint">Enter the same room code as your friend to play together</p>
+  </div>
+
+  <div id="waiting-screen" class="hidden">
+    <h2>WAITING FOR OPPONENT</h2>
+    <p>Room: <span id="room-display"></span></p>
+    <div class="loader"></div>
+    <button id="practice-btn">PRACTICE VS BOT</button>
+  </div>
+
+  <div id="game-container" class="hidden">
+    <canvas id="game-canvas"></canvas>
+    <div id="hud">
+      <div id="player1-hud" class="player-hud">
+        <span class="player-name"></span>
+        <div class="health-bar"><div class="health-fill"></div></div>
+      </div>
+      <div id="player2-hud" class="player-hud">
+        <span class="player-name"></span>
+        <div class="health-bar"><div class="health-fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="game-over" class="hidden">
+    <h2 id="winner-text"></h2>
+    <button id="restart-btn">PLAY AGAIN</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
