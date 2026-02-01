@@ -13,6 +13,7 @@
       <input type="text" id="player-name" placeholder="Your Name" maxlength="12">
       <input type="text" id="room-id" placeholder="Room Code" maxlength="8">
       <button id="join-btn">JOIN GAME</button>
+      <button id="spectate-btn">WATCH BOTS</button>
     </div>
     <p class="hint">Enter the same room code as your friend to play together</p>
   </div>
@@ -30,6 +31,11 @@
       <div id="player1-hud" class="player-hud">
         <span class="player-name"></span>
         <div class="health-bar"><div class="health-fill"></div></div>
+      </div>
+      <div id="score-display">
+        <span id="score-p1">0</span>
+        <span class="score-divider">-</span>
+        <span id="score-p2">0</span>
       </div>
       <div id="player2-hud" class="player-hud">
         <span class="player-name"></span>

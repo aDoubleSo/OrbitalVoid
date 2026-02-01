@@ -178,6 +178,30 @@ button:active {
   width: 100%;
 }
 
+#score-display {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#score-p1 {
+  color: #00d4ff;
+}
+
+#score-p2 {
+  color: #ff6644;
+}
+
+.score-divider {
+  color: #555;
+}
+
 #game-over {
   position: fixed;
   top: 50%;

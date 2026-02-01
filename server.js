@@ -75,6 +75,19 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('spectate', () => {
+    const roomId = 'spectate_' + socket.id;
+    const room = getOrCreateRoom(roomId);
+
+    socket.join(roomId);
+    playerRooms.set(socket.id, roomId);
+
+    room.addTwoBots();
+
+    socket.emit('spectateStart', { playerId: socket.id, roomId });
+    console.log(`Spectate mode started in room: ${roomId}`);
+  });
+
   socket.on('disconnect', () => {
     const roomId = playerRooms.get(socket.id);
     if (roomId) {
@@ -100,18 +113,30 @@ io.on('connection', (socket) => {
 
     const oldRoom = rooms.get(roomId);
     if (oldRoom && oldRoom.state === 'ended') {
-      // Create fresh room with same players
+      // Create fresh room
       const newRoom = new GameRoom(roomId);
-      const players = [...oldRoom.rockets.values()];
-
       rooms.set(roomId, newRoom);
 
-      for (const player of players) {
-        newRoom.addPlayer(player.id, player.name);
-      }
+      // Check if this is a spectate room (bot vs bot)
+      if (roomId.startsWith('spectate_')) {
+        newRoom.addTwoBots();
+        socket.emit('spectateStart', { playerId: socket.id, roomId });
+      } else {
+        // Regular room - add human players back
+        const players = [...oldRoom.rockets.values()].filter(p => !p.isBot);
 
-      if (newRoom.state === 'playing') {
-        io.to(roomId).emit('gameStart');
+        for (const player of players) {
+          newRoom.addPlayer(player.id, player.name);
+        }
+
+        // If there was a bot, add it back
+        if (oldRoom.bots.length > 0) {
+          newRoom.addBot();
+        }
+
+        if (newRoom.state === 'playing') {
+          io.to(roomId).emit('gameStart');
+        }
       }
     }
   });

@@ -11,6 +11,7 @@ const ctx = canvas.getContext('2d');
 const playerNameInput = document.getElementById('player-name');
 const roomIdInput = document.getElementById('room-id');
 const joinBtn = document.getElementById('join-btn');
+const spectateBtn = document.getElementById('spectate-btn');
 const practiceBtn = document.getElementById('practice-btn');
 const restartBtn = document.getElementById('restart-btn');
 const roomDisplay = document.getElementById('room-display');
@@ -20,6 +21,9 @@ const winnerText = document.getElementById('winner-text');
 let playerId = null;
 let currentState = null;
 let gameStarted = false;
+let isSpectator = false;
+let scores = { player1: 0, player2: 0 };
+let matchEnded = false;
 
 // Input state
 const input = {
@@ -82,6 +86,11 @@ roomIdInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') joinBtn.click();
 });
 
+spectateBtn.addEventListener('click', () => {
+  isSpectator = true;
+  socket.emit('spectate');
+});
+
 practiceBtn.addEventListener('click', () => {
   socket.emit('practice');
 });
@@ -105,18 +114,43 @@ socket.on('waiting', (data) => {
 
 socket.on('gameStart', () => {
   gameStarted = true;
+  matchEnded = false;
   waitingScreen.classList.add('hidden');
   gameContainer.classList.remove('hidden');
   gameOverScreen.classList.add('hidden');
 });
 
+socket.on('spectateStart', (data) => {
+  playerId = data.playerId;
+  isSpectator = true;
+  gameStarted = true;
+  matchEnded = false;
+  loginScreen.classList.add('hidden');
+  waitingScreen.classList.add('hidden');
+  gameContainer.classList.remove('hidden');
+});
+
 socket.on('state', (state) => {
   currentState = state;
 
-  if (state.state === 'ended' && gameStarted) {
+  if (state.state === 'ended' && gameStarted && !matchEnded) {
+    matchEnded = true;
     const winner = state.rockets.find(r => r.id === state.winner);
+
+    // Update scores
+    if (state.winner !== null && state.rockets.length >= 2) {
+      const winnerIndex = state.rockets.findIndex(r => r.id === state.winner);
+      if (winnerIndex === 0) {
+        scores.player1++;
+      } else {
+        scores.player2++;
+      }
+      updateScoreDisplay();
+    }
+
     if (state.winner === null) {
       winnerText.textContent = 'DRAW!';
+      winnerText.style.color = '#ffaa00';
     } else if (state.winner === playerId) {
       winnerText.textContent = 'YOU WIN!';
       winnerText.style.color = '#00ff88';
@@ -137,6 +171,12 @@ socket.on('playerLeft', () => {
 socket.on('error', (data) => {
   alert(data.message);
 });
+
+// Score display update
+function updateScoreDisplay() {
+  document.getElementById('score-p1').textContent = scores.player1;
+  document.getElementById('score-p2').textContent = scores.player2;
+}
 
 // HUD update
 function updateHUD(state) {
